@@ -1,0 +1,32 @@
+{% load staticfiles %}
+<html>
+<head> 
+
+<script type="text/javascript" src="{% static 'data_vis/js/utils.js' %}"></script>
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'data_vis/css/test.css' %}" />
+</head>
+<body onload="init()">
+
+<table>
+<tr><td>
+  
+   <table class="billboardtable">
+ 
+   {% for billboard in billboards %}
+   	 <tr>
+   	 <td>{{billboard.name}}</td><td>{{billboard.lat}}</td><td>{{billboard.lng}}</td>
+   	 </tr>
+   {% endfor %}
+   
+   </table>   
+  
+</td></tr>
+
+</table>
+
+	
+
+</body>
+</html>
