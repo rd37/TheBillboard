@@ -1,0 +1,6 @@
+[
+ {% for billboard in billboards %}
+    {"pk":{{billboard.pk}},"owner": {{ billboard.owner }}, "name": {{ billboard.name }}, "lat": {{ billboard.lat }}, "lng": {{ billboard.lng }} }
+    {% if not forloop.last %} , {% endif %}
+ {% endfor %}
+]

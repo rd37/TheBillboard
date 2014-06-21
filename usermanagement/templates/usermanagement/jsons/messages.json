@@ -1,0 +1,6 @@
+[
+ {% for message in Messages %}
+    { "pk":{{message.pk}},"owner": {{ message.owner.pk }}, "billboard": {{ message.billboard.pk }}, "text": {{ message.text }}, "start_date": {{ message.start_date }}, "stop_date": {{ message.stop_date }} }
+    {% if not forloop.last %} , {% endif %}
+ {% endfor %}
+]

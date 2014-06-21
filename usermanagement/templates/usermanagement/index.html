@@ -2,26 +2,276 @@
 <html>
 <head> 
 
-<script type="text/javascript" src="{% static 'data_vis/js/utils.js' %}"></script>
+<script type="text/javascript" src="{% static 'usermanagement/js/utils.js' %}"></script>
 
 
-<link rel="stylesheet" type="text/css" href="{% static 'data_vis/css/test.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'usermanagement/css/test.css' %}" />
+
+<script>
+var utils = new HTTPUtils();
+var httpObj;
+var httpObj1;
+var httpObj2;
+var httpObj3;
+var httpObj4;
+var httpObj5;
+var httpObj6;
+var httpObj7;
+var httpObj8;
+var httpObj9;
+var httpObj10;
+var httpObj11;
+var httpObj12;
+var httpObj13;
+
+var state=0;
+var un = "ZAEKTCJJSFYI" ;
+var pw = "SIONVHAJPVDD";
+
+function login_billboard_cb(){
+	if(httpObj2.readyState==4){
+		console.log("got login billboard call back "+httpObj2.responseText);
+		state=2;
+		console.log(httpObj2.responseText)
+	}
+}
+
+function login_billboard_cb_2(){
+	if(httpObj4.readyState==4){
+		console.log("got login billboard call back #2 "+httpObj4.responseText);
+		state=5;
+		console.log(httpObj4.responseText)
+	}
+}
+
+function list_your_billboards_cb(){
+	if(httpObj5.readyState==4){
+		console.log("got list your billboards call back "+httpObj5.responseText);
+		state=6;
+	}
+}
+
+function search_billboard_cb(){
+	if(httpObj.readyState==4){
+		console.log("got search billboard call back "+httpObj.responseText);
+	}
+}
+
+function add_billboard_cb(){
+	if(httpObj6.readyState==4){
+		console.log("got add billboard call back "+httpObj6.responseText);
+		state=7;
+	}
+}
+
+function remove_billboard_cb(){
+	if(httpObj8.readyState==4){
+		console.log("got remove billboard call back "+httpObj8.responseText);
+		state=9;
+		document.write(httpObj8.responseText);
+	}
+}
+
+function update_billboard_cb(){
+	if(httpObj9.readyState==4){
+		console.log("got update billboard call back "+httpObj9.responseText);
+		state=10;
+		document.write(httpObj9.responseText);
+	}
+}
+
+function remove_msg_billboard_cb(){
+	if(httpObj10.readyState==4){
+		console.log("got remove message billboard call back "+httpObj10.responseText);
+		state=11;
+		document.write(httpObj10.responseText);
+	}
+}
+
+function update_msg_billboard_cb(){
+	if(httpObj11.readyState==4){
+		console.log("got update message billboard call back "+httpObj11.responseText);
+		state=12;
+		document.write(httpObj11.responseText);
+	}
+}
+
+function list_your_messages_cb(){
+	if(httpObj12.readyState==4){
+		console.log("got list your messages call back "+httpObj12.responseText);
+		state=13;
+		document.write(httpObj12.responseText);
+	}
+}
+
+
+function add_msg_billboard_cb(){
+	if(httpObj7.readyState==4){
+		console.log("got add msg to billboard call back "+httpObj7.responseText);
+		//document.write(httpObj7.responseText);
+		state=8;
+	}
+}
+
+function get_billboard_messages_cb(){
+	if(httpObj1.readyState==4){
+		console.log("got billboard messages call back "+httpObj1.responseText);
+		state=3;
+		document.write(httpObj1.responseText);
+	}
+}
+
+function system_register_cb(){
+	if(httpObj3.readyState==4){
+		state=4;
+		console.log("got system register call back "+httpObj3.responseText);
+		json_req = JSON.parse(httpObj3.responseText)
+		un = json_req.response.un;
+		pw = json_req.response.pw;
+		console.log("registered new un,pw "+un+","+pw+"  now login ");
+		
+	}
+}
+
+
+function sleep(millis, callback) {
+    setTimeout(function()
+            { callback(); }
+    , millis);
+}
+
+var count=0;
+
+function init(){
+	console.log("in state "+state);
+	if (state == 0){
+		//login
+		httpObj2 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj2,"system_login/",'{"request":"login_request","username":"rd","password":"bhreagh"}',login_billboard_cb);
+		init();
+	}else if(state == 1){
+		console.log("waiting for state transition callback");
+		sleep(1000,init);
+	}else if(state == 2){
+		
+		state = 1;
+		httpObj1 = utils.CreateHttpObject();
+		//list a billboards messages
+		utils.sendViaPOST(httpObj1,"request/",'{"request":"get_billboard_messages","billboard_id":"1"}',get_billboard_messages_cb);
+		init();
+		
+	}else if(state == 3){
+		httpObj3 = utils.CreateHttpObject();
+		//list a billboards messages
+		state=1;
+		utils.sendViaPOST(httpObj3,"system_register/",'{"request":"auto_register_device"}',system_register_cb);
+		init();
+	}else if(state == 4){
+		httpObj4 = utils.CreateHttpObject();
+		state=1;
+		//utils.sendViaPOST(httpObj4,"system_login/",'{"request":"login_request","username":"'+un+'","password":"'+pw+'"}',login_billboard_cb_2);
+		utils.sendViaPOST(httpObj4,"system_login/",'{"request":"login_request","username":"rd","password":"bhreagh"}',login_billboard_cb_2);
+		init();
+	}else if(state == 5){
+		console.log("login,registration testing completed now test billboard functionalities");
+		//list your billboards
+		httpObj5 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj5,"request/",'{"request":"list_your_billboards"}',list_your_billboards_cb);
+		init();
+		
+	}else if(state == 6){
+		console.log("add billboard now")
+		//add a billboard
+		httpObj6 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj6,"request/",'{"request":"add_billboard","name":"RONS_test_bb","lat":-142.1111,"lng":48.7777}',add_billboard_cb);
+		init();
+		
+	}else if(state == 7){
+		console.log("add message to billboard now")
+		//add message to billboard
+		httpObj7 = utils.CreateHttpObject();
+		state=1;
+		curr_date = new Date();
+		future_date_time = (new Date(+curr_date + 15*60000) ).toISOString();
+		console.log("date is "+future_date_time+" curr date is "+curr_date.toISOString());
+		utils.sendViaPOST(httpObj7,"request/",'{"request":"add_msg_to_billboard","billboard_id":"1","message":{"text":"hello dude","exp_date":"'+future_date_time+'"} }',add_msg_billboard_cb);
+		init();
+	}else if(state == 8){
+		console.log("attempt add message complete");
+		//remove billboard
+		httpObj8 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj8,"request/",'{"request":"remove_billboard","billboard_id":"8"}',remove_billboard_cb);
+		init();
+	}else if(state == 9){
+		console.log("attempt to remove bb complete");
+		httpObj9 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj9,"request/",'{"request":"update_billboard","billboard_id":"5","name":"RONS_updated_test_bb","lat":-142.1231,"lng":48.7997}',update_billboard_cb);
+		init();
+	}else if(state == 10){
+		console.log("state is now 10 update bb complete");
+		httpObj10 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj10,"request/",'{"request":"remove_msg_from_billboard","billboard_id":"1","message_id":"1"}',remove_msg_billboard_cb);
+		init();
+	}else if(state == 11){
+		console.log("remove message from bb complete");
+		httpObj11 = utils.CreateHttpObject();
+		state=1;
+		curr_date = new Date();
+		future_date_time = (new Date(+curr_date + 15*60000) ).toISOString();
+		utils.sendViaPOST(httpObj11,"request/",'{"request":"update_msg_on_billboard","billboard_id":"1","message_id":"1","message":{"text":"hello dude updated","exp_date":"'+future_date_time+'"}}',update_msg_billboard_cb);
+		init();
+	}else if(state == 12){
+		console.log("update message complete");
+		httpObj12 = utils.CreateHttpObject();
+		state=1;
+		utils.sendViaPOST(httpObj12,"request/",'{"request":"list_your_messages"}',list_your_messages_cb);
+		init();
+	}else if(state == 13){
+		console.log("list your messages complete");
+	}
+}
+</script>
+
 </head>
 <body onload="init()">
 
 <table>
 <tr><td>
-  
-   <table class="billboardtable">
- 
+   billboards:{{billboards.count}}:
+   <table class="billboardtable" border=1>
+ 	  <tr><td>Billboard Name</td><td>Latitude</td><td>Longitude</td></tr>
    {% for billboard in billboards %}
    	 <tr>
    	 <td>{{billboard.name}}</td><td>{{billboard.lat}}</td><td>{{billboard.lng}}</td>
    	 </tr>
    {% endfor %}
-   
    </table>   
-  
+   <hr>
+   messages:{{Messages.count}}:
+   <table class="messagetable" border=1>
+ 	  <tr><td>User</td><td>Billboard Name</td><td>Text</td><td>Start Date</td><td>End Date</td></tr>
+   {% for message in Messages %}
+   	 <tr>
+   	 <td>{{message.owner}}</td><td>{{message.billboard}}</td><td>{{message.text}}</td><td>{{message.start_date}}</td><td>{{message.stop_date}}</td>
+   	 </tr>
+   {% endfor %}
+   </table> 
+   <hr>
+   users:{{users.count}}
+   <table class="usertable" border=1>
+ 	  <tr><td>User Name</td><td>Password</td><td>Email</td></tr>
+   {% for user in users %}
+   	 <tr>
+   	 <td>{{user.user_name}}</td><td>{{user.password}}</td><td>{{user.email}}</td>
+   	 </tr>
+   {% endfor %}
+   </table> 
 </td></tr>
 
 </table>
