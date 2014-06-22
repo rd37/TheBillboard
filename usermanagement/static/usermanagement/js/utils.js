@@ -16,7 +16,7 @@ function GetXmlHttpObject()
 function HTTPUtils()
 {
   this.sendViaPOST=function(httpReq,url,jsonMsg,callback){
-    console.log("Try to Send POST JSON Req");
+    console.log("Try to Send POST JSON Req "+url);
 	httpReq.onreadystatechange=callback;
 	httpReq.open("POST",url,true);
 	httpReq.setRequestHeader("Content-type","application/x-www-form-urlencoded");

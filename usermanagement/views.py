@@ -69,7 +69,7 @@ def system_register(request):
 
 @csrf_exempt
 def system_login(request):
-    pprint("login attempt")
+    pprint("login attempt %s"%request.POST)
     jsonMsg = request.POST['jsonMsg']
     json_req = json.loads(jsonMsg)
     pprint("Got Post Request ---k %s"%json_req['request'])
@@ -102,13 +102,16 @@ def system_login(request):
 def _is_time_up(request):
     request.session.set_expiry(_SESSION_TIME)
 
+
 @csrf_exempt
-@login_required
+#@login_required
 def data(request):
+    #pprint("request data")
     _is_time_up(request)
     jsonMsg = request.POST['jsonMsg']
     json_req = json.loads(jsonMsg)
     retstring = ""
+    pprint("request %s"%json_req)
     if json_req['request'] == "search_billboards":
         sLat = json_req['latitude']
         sLng=json_req['longitude']
@@ -130,7 +133,10 @@ def data(request):
         template = loader.get_template('usermanagement/jsons/billboards.json')
         retstring = template.render(bb_context)
     elif json_req['request'] == "add_billboard":
-        bb = billboards(owner=request.user,name=json_req['name'],lat=json_req['lat'],lng=json_req['lng'])
+        user = User.objects.filter(username="rd")
+        print "add billboard %s"%user[0]
+        bb = billboards(owner=user[0],name=json_req['name'],lat=json_req['lat'],lng=json_req['lng'])
+        pprint("done creating billboard")
         bb.save()
         bb_context = RequestContext(request, {'billboards': [bb] } )
         pprint("almost there")
@@ -144,14 +150,16 @@ def data(request):
         retstring="saved message to bb"
     elif json_req['request'] == 'remove_billboard':
         pprint("try to remove bb")
-        #bb = billboards.objects.filter(pk=json_req['billboard_id'])
-        bb = request.user.billboards_set.filter(pk=json_req['billboard_id'])
+        bb = billboards.objects.filter(pk=json_req['billboard_id'])
+        #bb = request.user.billboards_set.filter(pk=json_req['billboard_id'])
         bb.delete()
         retstring="bb removed ... maybe"
     elif json_req['request'] == 'update_billboard':
-        pprint("try to update bb")
-        #bb = billboards.objects.filter(pk=json_req['billboard_id'])
-        bb = request.user.billboards_set.get(pk=json_req['billboard_id'])
+        print "try to update bb %s"%json_req['billboard_id']
+        bb = billboards.objects.filter(pk=json_req['billboard_id'])
+        #print "found %s"%bb
+        bb=bb[0]
+        #bb = request.user.billboards_set.get(pk=json_req['billboard_id'])
         bb.name = json_req['name']
         bb.lat = json_req['lat']
         bb.lng = json_req['lng']
@@ -178,7 +186,7 @@ def data(request):
         bb_context = RequestContext(request, {'Messages': user_messages } )
         template = loader.get_template('usermanagement/jsons/messages.json')
         retstring = template.render(bb_context)
-    return HttpResponse( "Got it %s ::: %s"%(jsonMsg,retstring) );
+    return HttpResponse( "%s"%(retstring) );
 
 def index(request):
     template = loader.get_template('usermanagement/index.html')
